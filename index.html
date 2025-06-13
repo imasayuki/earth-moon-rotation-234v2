@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Earth and Moon Rotation in A-Frame</title>
+    <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+</head>
+<body>
+    <a-scene>
+        <!-- Group for Earth -->
+        <a-entity id="earthGroup" position="0 0 -5" rotation="0 0 23.4">
+            <!-- Earth -->
+            <a-sphere id="earth" radius="1" src="https://cdn.glitch.global/561de55b-61eb-4366-8bd4-21494d458ca8/earth_tx.png?v=1708310150177"></a-sphere>
+        </a-entity>
+
+        <!-- 地軸 Axis -->
+        <a-entity id="axisGroup" position="0 0 -5" rotation="0 0 23.4">
+            <a-cylinder id="axis" height="3" radius="0.02" color="#ffffff"></a-cylinder>
+        </a-entity>
+
+        <!-- Moon -->
+        <a-sphere id="moon" radius="0.3" position="1.5 0 -5" src="https://cdn.glitch.global/561de55b-61eb-4366-8bd4-21494d458ca8/0303_moon_01.png?v=1708310155391"></a-sphere>
+
+        <!-- Camera -->
+        <a-camera position="0 0 0"></a-camera>
+
+        <a-sky src="https://cdn.glitch.global/561de55b-61eb-4366-8bd4-21494d458ca8/cosmos_tx.png?v=1708310163891"></a-sky>
+
+    </a-scene>
+
+    <script>
+        // Get reference to the earth and moon entities
+        var speed = 1800　//実際の速さの何倍速？
+        var earth = document.querySelector("#earth");
+        var moon = document.querySelector("#moon");
+        
+        // Initialize rotation angles for earth and moon
+        var earthRotationAngle = 0; // 地球の自転角度を初期化
+        var moonOrbitAngle = 0; // 月のこうてん角度を初期化
+        var moonRotationAngle = 0; // 月の自転角度を初期化
+      
+        var earthRotationPeriod = 1 * 24 * 3600 / speed; // 地球の自転周期（秒） Earth's rotational period in seconds　を1800倍
+        var earthRotationSpeed = (2 * Math.PI) / earthRotationPeriod; // 地球の自転速度（ラジアン/秒） Earth's rotational speed in radians per second
+
+        var moonOrbitRadius = 1.5; // 月の公転半径 Radius of moon's orbit
+        var moonOrbitPeriod = 27.3 * 24 * 3600 / speed; // 月の公転周期（秒） Moon's orbital period in seconds
+        var moonOrbitSpeed = (2 * Math.PI) / moonOrbitPeriod; // 月の公転速度（ラジアン/秒） Moon's orbital speed in radians per second　を1800倍
+        
+        var moonRotationPeriod = 27.3 * 24 * 3600 / speed; // 月の自転周期（秒） Moon's rotational period in seconds　を1800倍
+        var moonRotationSpeed = (2 * Math.PI) / moonRotationPeriod; // 月の自転速度（ラジアン/秒） Moon's rotational speed in radians per second
+
+        // Function to update rotation
+        function updateRotation() {
+            // Increment rotation angle for earth's self-rotation
+            earthRotationAngle +=earthRotationSpeed;
+
+            // Set rotation for the earth entity
+            earth.setAttribute("rotation", "0 " + earthRotationAngle * 180 / Math.PI + " 0"); //earthRotationAngle * 180 / Math.PI ラジアンを角度に変換
+
+            // Increment moon's rotation angle (self-rotation)
+            moonRotationAngle += moonRotationSpeed;
+
+            // Set rotation for moon entity (self-rotation)
+            moon.setAttribute("rotation", "0 " + moonRotationAngle * 180 / Math.PI + " 0"); //moonRotationAngle * 180 / Math.PI ラジアンを度数変換
+
+            // Increment moon's orbit angle (orbital motion)
+            moonOrbitAngle += moonOrbitSpeed; // 月の公転速度に合わせて増加
+
+            // Update moon's position to orbit around the earth
+            var moonX = Math.cos(moonOrbitAngle) * moonOrbitRadius;
+            var moonZ = Math.sin(moonOrbitAngle) * moonOrbitRadius - 5; // Adjust for scene position
+            moon.setAttribute("position", moonX + " 0 " + moonZ);
+
+            // Request next frame update
+            requestAnimationFrame(updateRotation);
+        }
+
+        // Start updating rotation
+        updateRotation();
+    </script>
+</body>
+</html>
